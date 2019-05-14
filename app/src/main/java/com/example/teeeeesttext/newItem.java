@@ -22,6 +22,7 @@ public class newItem extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         db = new DBHandler(this);
 
+
        setContentView(R.layout.activity_new_item);
 
         TextView tvItemList = (TextView) findViewById(R.id.tvItemList);
@@ -34,7 +35,7 @@ public class newItem extends AppCompatActivity {
 
         for (item itm : itemsList) {
 
-            String stdDetail = "\n\nID:" + itm.getID() + "\n\tNAME:" + itm.getName() + "\n\tDESC" + itm.getDesc();
+            String stdDetail = "\n\nID: " + itm.getID() + "\n\tNAME: " + itm.getName() + "\n\tDESC: " + itm.getDesc();
             tvItemList.append("\n" + stdDetail);
             //	Log.i("TAG", log);
         }
@@ -45,17 +46,21 @@ public class newItem extends AppCompatActivity {
             @Override
             public void onClick(View v){
 
+
                 EditText fieldName = findViewById(R.id.itemNameField);
                 EditText fieldDesc =  findViewById(R.id.itemDescField);
 
-                String Name, Desc;
-                Name = fieldName.getText().toString();
-                Desc = fieldDesc.getText().toString();
 
-                item insert = new item(Name, Desc);
+                    String Name, Desc;
+                    Name = fieldName.getText().toString();
+                    Desc = fieldDesc.getText().toString();
 
-                db.addNewItem(insert);
-                finish();
+
+                    item insert = new item(Name, Desc);
+
+                    db.addNewItem(insert);
+                    finish();
+
             }
         });
 

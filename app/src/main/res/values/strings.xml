@@ -10,4 +10,6 @@
     <string name="insert_name_here">Insert Name Here</string>
     <string name="item_description">Item Description</string>
     <string name="add">Add</string>
+    <string name="insert_item_id">Insert item ID</string>
+    <string name="quantity">Quantity</string>
 </resources>

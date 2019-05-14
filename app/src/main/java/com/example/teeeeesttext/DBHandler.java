@@ -1,10 +1,13 @@
 package com.example.teeeeesttext;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.view.View;
 
 import com.example.teeeeesttext.models.item;
 import com.example.teeeeesttext.models.recipe;
@@ -72,8 +75,8 @@ public class DBHandler extends SQLiteOpenHelper {
                 +RECIPE_PREPTIME+" TEXT)";
         String CREATE_ITEM= "CREATE TABLE "+TABLE_ITEM+" ("
                 +ID_COLUMN+" INTEGER PRIMARY KEY AUTOINCREMENT,"
-                +NAME_COLUMN+ " TEXT, "
-                +DESC_COLUMN+ "TEXT)";
+                +NAME_COLUMN+ " TEXT,"
+                +DESC_COLUMN+ " TEXT)";
         String CREATE_SHOPPINGLIST="CREATE TABLE "+TABLE_SHOPPINGLIST+" ("
                 +ID_COLUMN+" INTEGER PRIMARY KEY,"
                 +SHOPPINGLIST_DATE+ " DATE)";
@@ -144,13 +147,13 @@ public class DBHandler extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
 
+        values.put(ID_COLUMN, newItem.getID());
         values.put(NAME_COLUMN, newItem.getName());
         values.put(DESC_COLUMN, newItem.getDesc());
 
 
         // Inserting Row
         db.insert(TABLE_ITEM, null, values);
-        db.close(); // Closing database connection
     }
 
     // Getting All Items
@@ -171,8 +174,8 @@ public class DBHandler extends SQLiteOpenHelper {
 
                 item itm = new item();
                 itm.setID(Integer.parseInt(cursor.getString(0)));
-                itm.setName(cursor.getString(2));
-                itm.setDesc(cursor.getString(3));
+                itm.setName(cursor.getString(1));
+                itm.setDesc(cursor.getString(2));
 
                 // Adding contact to list
                 itemList.add(itm);
@@ -215,4 +218,5 @@ public class DBHandler extends SQLiteOpenHelper {
     db.insert(TABLE_SHOPPINGLIST, null, values);
     db.close();
     }
+
 }
