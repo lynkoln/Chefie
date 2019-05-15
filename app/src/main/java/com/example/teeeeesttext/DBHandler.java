@@ -1,14 +1,14 @@
 package com.example.teeeeesttext;
 
-import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.view.View;
+import android.widget.Toast;
 
+import com.example.teeeeesttext.models.fridge;
+import com.example.teeeeesttext.models.fridgeItem;
 import com.example.teeeeesttext.models.item;
 import com.example.teeeeesttext.models.recipe;
 import com.example.teeeeesttext.models.shoppinglist;
@@ -75,7 +75,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 +RECIPE_PREPTIME+" TEXT)";
         String CREATE_ITEM= "CREATE TABLE "+TABLE_ITEM+" ("
                 +ID_COLUMN+" INTEGER PRIMARY KEY AUTOINCREMENT,"
-                +NAME_COLUMN+ " TEXT,"
+                +NAME_COLUMN+ " TEXT, "
                 +DESC_COLUMN+ " TEXT)";
         String CREATE_SHOPPINGLIST="CREATE TABLE "+TABLE_SHOPPINGLIST+" ("
                 +ID_COLUMN+" INTEGER PRIMARY KEY,"
@@ -156,6 +156,7 @@ public class DBHandler extends SQLiteOpenHelper {
         db.insert(TABLE_ITEM, null, values);
     }
 
+
     // Getting All Items
     public List<item> getAllItemList() {
 
@@ -186,6 +187,92 @@ public class DBHandler extends SQLiteOpenHelper {
         // return contact list
         return itemList;
 }
+    //Adding new item to fridge
+    public void addNewFridgeEntry(fridge fridge){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+
+        values.put(QUANTITY_COLUMN,fridge.getQuantity());
+        values.put(FOREIGN_ITEM_ID,fridge.getItem_ID());
+
+        db.insert(TABLE_FRIDGE,null, values);
+
+    }
+
+    //Removing record of fridge
+    public Integer removeFridgeEntry(Integer ID, Integer Quantity){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Integer result;
+
+        String selectQuery = "SELECT Quantity " +
+                "FROM fridge " +
+                "WHERE ID = "+ID;
+
+        Cursor queryResult = db.rawQuery(selectQuery, null);
+        if (queryResult.moveToFirst()) {
+
+            result = Integer.parseInt(queryResult.getString(0));
+
+        }
+        else{
+            result = 0;
+        }
+
+        if(Quantity == result || Quantity >= result){
+            return db.delete(TABLE_FRIDGE,  ID.toString() + "=" + ID_COLUMN, null);
+        }
+        else if(Quantity < result && Quantity > 0){
+            ContentValues args = new ContentValues();
+
+            args.put(QUANTITY_COLUMN, result - Quantity);
+
+            return db.update(TABLE_FRIDGE,args, ID.toString() + "=" + ID_COLUMN, null);
+        }
+        else{
+            return -1;
+        }
+    }
+
+    //getting all fridge records
+    public List<fridgeItem> getAllFridgeList(){
+        List<fridgeItem> fridgeList = new ArrayList<>();
+
+        // Select All Query
+        String selectQuery = "SELECT a.ID, a.Quantity, b.Name FROM fridge a JOIN item b ON a.Item_ID = b.ID";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery,null);
+        if( cursor.getCount() > 0 ){
+            if (cursor.moveToFirst()) {
+                do {
+                    //need to add join container
+                    fridgeItem itm = new fridgeItem();
+                    itm.setID(Integer.parseInt(cursor.getString(0)));
+                    itm.setQuantity(Integer.parseInt(cursor.getString(1)));
+                    itm.setName(cursor.getString(2));
+
+
+                    // Adding contact to list
+                    fridgeList.add(itm);
+
+                } while (cursor.moveToNext());
+            }
+
+            return fridgeList;
+        }
+        else{
+            fridgeItem itm = new fridgeItem();
+            itm.setID(0);
+            itm.setQuantity(0);
+            itm.setName("NaH");
+
+            fridgeList.add(itm);
+
+            return fridgeList;
+        }
+    }
+
 
     //Adding new recipe
     void addNewRecipe(recipe newRecipe){

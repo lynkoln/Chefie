@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/quantity"
-        android:inputType="number" />
+        android:inputType="number"
+        android:autofillHints="" />
 
     <Spinner
         android:id="@+id/ItemSpinner"
@@ -18,4 +19,22 @@
         android:layout_height="wrap_content"
         android:spinnerMode="dialog"
         android:textColor="@color/black"/>
+
+    <TextView
+        android:id="@+id/mTV_ID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"/>
+
+    <TextView
+        android:id="@+id/mTv_name"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/mTv_desc"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="" />
 </LinearLayout>

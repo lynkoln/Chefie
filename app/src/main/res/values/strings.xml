@@ -12,4 +12,7 @@
     <string name="add">Add</string>
     <string name="insert_item_id">Insert item ID</string>
     <string name="quantity">Quantity</string>
+    <string name="item_name">Item Name:</string>
+    <string name="remove">Remove</string>
+    <string name="x">x</string>
 </resources>

@@ -6,6 +6,10 @@ public class fridge {
     private Integer Quantity;
     private Integer Item_ID;
 
+    public fridge(){
+
+    }
+
     public fridge(Integer ID, Integer quantity, Integer item_ID) {
         this.ID = ID;
         Quantity = quantity;
