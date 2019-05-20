@@ -8,12 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,21 +28,23 @@ import static android.widget.Toast.LENGTH_SHORT;
 public class MyFridge extends AppCompatActivity {
 
     DBHandler db;
-    EditText quan;
+    EditText quan, QuantityPrompt;
     ListView listView;
+    Button addFridgeItem;
     TextView mName, mDesc, mID;
-    Integer selectedID, quantity, itemid;
+    Integer selectedID, quantity, itemid, QuantityDialogValue;
     String selectedName, selectedDesc;
     List<item> items;
     List<fridgeItem> fridgeList;
     Spinner spinner;
+    SpinnerAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_fridge);
         db = new DBHandler(this);
-        Button addFridgeItem;
+
         addFridgeItem = (Button) findViewById(R.id.addFridgeBtn);
         fridgeList = db.getAllFridgeList();
         listView = (ListView)findViewById(R.id.fridgeList);
@@ -56,6 +58,7 @@ public class MyFridge extends AppCompatActivity {
         addFridgeItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
+
                 LayoutInflater layoutInflater = LayoutInflater.from(MyFridge.this);
                 View promptView = layoutInflater.inflate(R.layout.addprompt, null);
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(MyFridge.this);
@@ -68,10 +71,12 @@ public class MyFridge extends AppCompatActivity {
                 mDesc = promptView.findViewById(R.id.mTv_desc);
                 mID = promptView.findViewById(R.id.mTV_ID);
 
-                ArrayAdapter<item> spin = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, items);
-                spin.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                adapter = new SpinAdapter(MyFridge.this,
+                        android.R.layout.simple_spinner_item,
+                        items);
 
-                spinner.setAdapter(spin);
+
+                spinner.setAdapter(adapter);
                 spinner.setOnItemSelectedListener(listener);
 
 
@@ -90,6 +95,7 @@ public class MyFridge extends AppCompatActivity {
                                 fridge.setQuantity(quantity);
                                 fridge.setItem_ID(itemid);
                                 db.addNewFridgeEntry(fridge);
+                                recreate();
                             }
 
                         })
@@ -133,10 +139,57 @@ public class MyFridge extends AppCompatActivity {
             final TextView IdText = (TextView) convertView.findViewById(R.id.tv_view_id);
             Button removeButton = (Button) convertView.findViewById(R.id.removeFridgeButton);
 
+
+
             View.OnClickListener onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(MyFridge.this, "super"+db.removeFridgeEntry(  Integer.parseInt(IdText.getText().toString()),Integer.parseInt(QuanText.getText().toString())-1   ), Toast.LENGTH_SHORT).show();
+
+                    Integer temp = db.getFridgeQuantity(Integer.parseInt(IdText.getText().toString() ) );
+
+
+                    if(temp > 1) {
+
+
+                        LayoutInflater layoutInflater = LayoutInflater.from(MyFridge.this);
+                        final View promptView = layoutInflater.inflate(R.layout.quantity_layout, null);
+                        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MyFridge.this);
+                        alertDialog.setView(promptView);
+
+
+                        alertDialog.setCancelable(false)
+                                .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        QuantityPrompt = promptView.findViewById(R.id.tvQuantityPrompt);
+                                        QuantityDialogValue = Integer.parseInt(QuantityPrompt.getText().toString());
+
+                                        if (db.removeFridgeEntry(Integer.parseInt(IdText.getText().toString()), QuantityDialogValue) == -1) {
+                                            Toast.makeText(MyFridge.this, "Input Data Wrong", LENGTH_SHORT).show();
+
+                                        } else {
+                                            Toast.makeText(MyFridge.this,
+                                                    "Successfully removed"
+                                                    , LENGTH_SHORT).show();
+
+                                        }
+                                        recreate();
+                                    }
+
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                });
+                        alertDialog.create();
+                        alertDialog.show();
+                    }
+                    else{
+                        db.removeFridgeEntry(Integer.parseInt(IdText.getText().toString()), temp);
+                    }
+                    recreate();
                 }
             };
             removeButton.setOnClickListener(onClickListener);
@@ -156,7 +209,7 @@ public class MyFridge extends AppCompatActivity {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     parent.setSelection(position);
-                    Toast.makeText(MyFridge.this, "Hello Toast "+id+" "+position, LENGTH_SHORT).show();
+
 
                     Integer selection = Integer.parseInt(Long.toString(spinner.getSelectedItemId()));
 
@@ -177,6 +230,5 @@ public class MyFridge extends AppCompatActivity {
                 }
             };
 }
-
 
 

@@ -2,19 +2,23 @@ package com.example.teeeeesttext;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.ArrowKeyMovementMethod;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.teeeeesttext.models.item;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
 public class newItem extends AppCompatActivity {
-
+    List<item> itemsList;
     DBHandler db;
 
     @Override
@@ -25,20 +29,17 @@ public class newItem extends AppCompatActivity {
 
        setContentView(R.layout.activity_new_item);
 
-        TextView tvItemList = (TextView) findViewById(R.id.tvItemList);
+        ListView tvItemList = (ListView) findViewById(R.id.listView_item);
+        itemsList = db.getAllItemList();
+        Collections.sort(itemsList, new Comparator<item>() {
+            public int compare(item o1, item o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
 
-        tvItemList.setMovementMethod(ArrowKeyMovementMethod.getInstance());
-        tvItemList.setText("");
-        tvItemList.setPadding(5, 2, 5, 2);
+        ItemAdapter itemAdapter = new ItemAdapter();
+        tvItemList.setAdapter(itemAdapter);
 
-        List<item> itemsList = db.getAllItemList();
-
-        for (item itm : itemsList) {
-
-            String stdDetail = "\n\nID: " + itm.getID() + "\n\tNAME: " + itm.getName() + "\n\tDESC: " + itm.getDesc();
-            tvItemList.append("\n" + stdDetail);
-            //	Log.i("TAG", log);
-        }
 
         Button newItemBtn= findViewById(R.id.newItemButton);
 
@@ -59,12 +60,51 @@ public class newItem extends AppCompatActivity {
                     item insert = new item(Name, Desc);
 
                     db.addNewItem(insert);
-                    finish();
+                    recreate();
 
             }
         });
 
     }
+
+class ItemAdapter extends BaseAdapter{
+
+
+    @Override
+    public int getCount() {
+        Integer size = db.getAllItemList().size();
+        return size;
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        convertView = getLayoutInflater().inflate(R.layout.recycler_view_item,null);
+
+        TextView NameText = (TextView) convertView.findViewById(R.id.tv_view_name);
+        final TextView QuanText = (TextView) convertView.findViewById(R.id.tv_view_quan);
+        final TextView IdText = (TextView) convertView.findViewById(R.id.tv_view_id);
+        Button removeButton = (Button) convertView.findViewById(R.id.removeFridgeButton);
+
+        IdText.setText(itemsList.get(position).getID().toString());
+        NameText.setText(itemsList.get(position).getName());
+        QuanText.setText(itemsList.get(position).getDesc());
+        removeButton.setVisibility(View.INVISIBLE);
+        TextView label = (TextView)convertView.findViewById(R.id.Quantity);
+        label.setText("Description");
+        return convertView;
+    }
+}
+
 }
 
 

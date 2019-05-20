@@ -5,13 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.widget.Toast;
 
 import com.example.teeeeesttext.models.fridge;
 import com.example.teeeeesttext.models.fridgeItem;
 import com.example.teeeeesttext.models.item;
 import com.example.teeeeesttext.models.recipe;
 import com.example.teeeeesttext.models.shoppinglist;
+import com.example.teeeeesttext.models.singleListHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +75,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 +RECIPE_PREPTIME+" TEXT)";
         String CREATE_ITEM= "CREATE TABLE "+TABLE_ITEM+" ("
                 +ID_COLUMN+" INTEGER PRIMARY KEY AUTOINCREMENT,"
-                +NAME_COLUMN+ " TEXT, "
+                +NAME_COLUMN+ " TEXT,"
                 +DESC_COLUMN+ " TEXT)";
         String CREATE_SHOPPINGLIST="CREATE TABLE "+TABLE_SHOPPINGLIST+" ("
                 +ID_COLUMN+" INTEGER PRIMARY KEY,"
@@ -193,11 +193,23 @@ public class DBHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
 
-        values.put(QUANTITY_COLUMN,fridge.getQuantity());
-        values.put(FOREIGN_ITEM_ID,fridge.getItem_ID());
 
-        db.insert(TABLE_FRIDGE,null, values);
 
+        List<fridgeItem> fridgeList = getAllFridgeList();
+        Integer itemID = fridge.getItem_ID();
+        Integer indexOfItem = fridgeList.indexOf(itemID);
+        boolean fl = fridgeList.contains(fridge);
+
+        if(fridgeList.contains(itemID)){
+            values.put(QUANTITY_COLUMN, getFridgeQuantity(fridgeList.get(indexOfItem).getQuantity())+fridge.getQuantity());
+            db.update(TABLE_FRIDGE, values, "ID = ?",new String[]  {fridge.getID().toString()});
+        }
+
+        else {
+            values.put(QUANTITY_COLUMN,fridge.getQuantity());
+            values.put(FOREIGN_ITEM_ID,fridge.getItem_ID());
+            db.insert(TABLE_FRIDGE, null, values);
+        }
     }
 
     //Removing record of fridge
@@ -273,6 +285,20 @@ public class DBHandler extends SQLiteOpenHelper {
         }
     }
 
+    //get quantity of particular fridge item
+    public Integer getFridgeQuantity(Integer ID) {
+        Integer Quan = 0;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selectQuery = "SELECT "+QUANTITY_COLUMN+" FROM "+TABLE_FRIDGE+ " WHERE "+ID_COLUMN+ " = "+ ID;
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            Quan = Integer.parseInt(cursor.getString(0));
+        }
+        return Quan;
+    }
+
+
 
     //Adding new recipe
     void addNewRecipe(recipe newRecipe){
@@ -306,4 +332,99 @@ public class DBHandler extends SQLiteOpenHelper {
     db.close();
     }
 
+
+    //Getting shopping lists
+    public List<shoppinglist> getAllShoppingLists(){
+        List<shoppinglist> ShoppingListList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String selectQuery ="SELECT * FROM "+TABLE_SHOPPINGLIST;
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                //need to add join container
+                shoppinglist itm = new shoppinglist();
+                itm.setID(Integer.parseInt(cursor.getString(0)));
+                itm.setDate(cursor.getString(1));
+
+
+                // Adding contact to list
+                ShoppingListList.add(itm);
+
+            } while (cursor.moveToNext());
+        }
+
+        if(ShoppingListList.size() < 1){
+            shoppinglist itm = new shoppinglist();
+            itm.setID(000);
+            itm.setDate("No Shopping Lists In Database Detected");
+
+            ShoppingListList.add(itm);
+        }
+        return ShoppingListList;
+    }
+
+    //Removing shopping list
+    public void removeShoppingList(Integer ID){
+        SQLiteDatabase db =this.getWritableDatabase();
+        db.delete(TABLE_SHOPPINGLIST,  ID.toString() + "=" + ID_COLUMN, null);
+        db.delete(TABLE_ITEMLIST, ID.toString()+ "="+ FOREIGN_SHOPPINGLIST_ID, null);
+    }
+
+    //get one full shopping list
+    public List<singleListHolder> getSingleShoppingList(Integer ID){
+        List<singleListHolder> ShoppingList = new ArrayList();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selectQuery =
+                "SELECT  l."+ID_COLUMN+", i."+ID_COLUMN+", i."+NAME_COLUMN+", l."+QUANTITY_COLUMN+", l.ILID "+
+                " FROM "+TABLE_ITEM+" i " +
+                "JOIN " +
+                "(SELECT l."+ID_COLUMN+", l."+FOREIGN_ITEM_ID+", l."+FOREIGN_SHOPPINGLIST_ID+", l."+QUANTITY_COLUMN+", s."+ID_COLUMN+" AS ILID, s."+SHOPPINGLIST_DATE+" " +
+                "FROM "+TABLE_ITEMLIST+" l " +
+                "JOIN "+TABLE_SHOPPINGLIST+" s ON l."+FOREIGN_SHOPPINGLIST_ID+" = s."+ID_COLUMN+" " +
+                "WHERE s."+ID_COLUMN+" = "+ID+")" +
+                "l " +
+                "ON l."+FOREIGN_ITEM_ID+" = i."+ID_COLUMN+"";
+
+                Cursor cursor = db.rawQuery(selectQuery, null);
+                if(cursor.moveToFirst()){
+                    do {
+                        //need to add join container
+                        singleListHolder itm = new singleListHolder();
+
+                        itm.setID(Integer.parseInt(cursor.getString(0)));
+                        itm.setItem_ID(Integer.parseInt(cursor.getString(1)));
+                        itm.setItem_Name(cursor.getString(2));
+                        itm.setQuantity(Integer.parseInt(cursor.getString(3)));
+                        itm.setShoppingList_ID(Integer.parseInt(cursor.getString(4)));
+
+                        // Adding item to list
+                        ShoppingList.add(itm);
+
+                    } while (cursor.moveToNext());
+                }
+        return ShoppingList;
+    }
+
+    //insert item to shopping list
+    public void addItemToShoppingList(singleListHolder holder){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(FOREIGN_ITEM_ID,holder.getItem_ID());
+        values.put(FOREIGN_SHOPPINGLIST_ID,holder.getShoppingList_ID());
+        values.put(QUANTITY_COLUMN,holder.getQuantity());
+
+        db.insert(TABLE_ITEMLIST, null, values);
+        db.close();
+    }
+
+    //remove shoppinglistitem record
+    public void removeShoppingListItem(Integer ID){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_ITEMLIST,ID_COLUMN+"="+ID.toString(), null);
+    }
 }

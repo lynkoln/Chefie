@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".newItem"></activity>
+        <activity android:name=".singleShoppingList"></activity>
+        <activity android:name=".newItem" />
         <activity
             android:name=".AddItem"
             android:label="@string/title_activity_add_item"

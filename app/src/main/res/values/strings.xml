@@ -15,4 +15,11 @@
     <string name="item_name">Item Name:</string>
     <string name="remove">Remove</string>
     <string name="x">x</string>
+    <string name="how_many_items_you_want_to_delete">How Many Items you want to delete?</string>
+    <string name="create_new_shopping_list">Create New Shopping List</string>
+    <string name="remove_list">Remove List</string>
+    <string name="shopping_list_from">Shopping List From:</string>
+    <string name="date">date</string>
+    <string name="add_shopping_list_item">Add Shopping List Item</string>
+
 </resources>
