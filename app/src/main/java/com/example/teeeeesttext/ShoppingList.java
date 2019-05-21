@@ -130,14 +130,9 @@ public class ShoppingList extends AppCompatActivity {
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(ShoppingList.this,"Added Something apparently",Toast.LENGTH_LONG).show();
-
                     Intent startIntent = new Intent(getApplicationContext(), singleShoppingList.class);
                     startIntent.putExtra("ID",lList.get(position).getID());
                     startActivity(startIntent);
-
-
-
                 }
             });
 

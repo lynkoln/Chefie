@@ -21,5 +21,7 @@
     <string name="shopping_list_from">Shopping List From:</string>
     <string name="date">date</string>
     <string name="add_shopping_list_item">Add Shopping List Item</string>
+    <string name="example">Example</string>
+    <string name="feature_will_be_added_soon">Feature will be added soon</string>
 
 </resources>

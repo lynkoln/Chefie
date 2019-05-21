@@ -29,7 +29,7 @@
                 android:id="@+id/mTv_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Example"
+                android:text="@string/example"
                 android:textColor="#43A047"
                 android:textSize="24sp" />
 

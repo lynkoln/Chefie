@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.teeeeesttext.models.fridge;
 import com.example.teeeeesttext.models.item;
@@ -83,14 +84,21 @@ public class singleShoppingList extends AppCompatActivity {
                         .setPositiveButton("Add", new DialogInterface.OnClickListener(){
                             @Override
                             public void onClick(DialogInterface dialog, int which){
-                                singleListHolder holder = new singleListHolder();
 
-                                holder.setShoppingList_ID(intValue);
-                                holder.setItem_ID(Integer.parseInt(mID.getText().toString()));
-                                holder.setQuantity(Integer.parseInt(quan.getText().toString()));
+                                if(quan.getText().toString().equals("")){
+                                    Toast.makeText(singleShoppingList.this,"One of the fields is empty",Toast.LENGTH_LONG).show();
+                                }
+                                else {
 
-                                db.addItemToShoppingList(holder);
-                                recreate();
+                                    singleListHolder holder = new singleListHolder();
+
+                                    holder.setShoppingList_ID(intValue);
+                                    holder.setItem_ID(Integer.parseInt(mID.getText().toString()));
+                                    holder.setQuantity(Integer.parseInt(quan.getText().toString()));
+
+                                    db.addItemToShoppingList(holder);
+                                    recreate();
+                                }
                             }
 
                         })
@@ -168,6 +176,8 @@ public class singleShoppingList extends AppCompatActivity {
             NameText.setText(local);
             QuanText.setText(cokal.toString());
 
+            removeButton.setText("Bought");
+            removeButton.setVisibility(View.VISIBLE);
             removeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

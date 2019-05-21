@@ -38,7 +38,7 @@ public class MyFridge extends AppCompatActivity {
     List<fridgeItem> fridgeList;
     Spinner spinner;
     SpinnerAdapter adapter;
-
+    fridge fridge;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,16 +86,23 @@ public class MyFridge extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which){
 
-                                Toast.makeText(MyFridge.this,"Added Something apparently",Toast.LENGTH_LONG).show();
-                                fridge fridge = new fridge();
 
-                                quantity = Integer.parseInt(quan.getText().toString());
-                                itemid = Integer.parseInt(mID.getText().toString());
 
-                                fridge.setQuantity(quantity);
-                                fridge.setItem_ID(itemid);
-                                db.addNewFridgeEntry(fridge);
-                                recreate();
+
+
+                                if(quan.getText().toString().equals("")) {
+                                    Toast.makeText(MyFridge.this, "One of the fields is empty",Toast.LENGTH_SHORT).show();
+                                }
+                                else {
+                                    quantity = Integer.parseInt(quan.getText().toString());
+                                    itemid = Integer.parseInt(mID.getText().toString());
+                                    fridge = new fridge();
+                                    fridge.setQuantity(quantity);
+                                    fridge.setItem_ID(itemid);
+                                    db.addNewFridgeEntry(fridge);
+                                    Toast.makeText(MyFridge.this,"Added Something apparently",Toast.LENGTH_LONG).show();
+                                    recreate();
+                                }
                             }
 
                         })
@@ -188,8 +195,8 @@ public class MyFridge extends AppCompatActivity {
                     }
                     else{
                         db.removeFridgeEntry(Integer.parseInt(IdText.getText().toString()), temp);
+                        recreate();
                     }
-                    recreate();
                 }
             };
             removeButton.setOnClickListener(onClickListener);

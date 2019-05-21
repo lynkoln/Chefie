@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.teeeeesttext.models.item;
 
@@ -56,12 +57,16 @@ public class newItem extends AppCompatActivity {
                     Name = fieldName.getText().toString();
                     Desc = fieldDesc.getText().toString();
 
+                    if(Name.equals("") || Desc.equals("")){
+                        Toast.makeText(newItem.this, "One of the fields is empty",Toast.LENGTH_SHORT).show();
+                    }
 
-                    item insert = new item(Name, Desc);
+                    else {
+                        item insert = new item(Name, Desc);
 
-                    db.addNewItem(insert);
-                    recreate();
-
+                        db.addNewItem(insert);
+                        recreate();
+                    }
             }
         });
 

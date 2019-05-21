@@ -53,10 +53,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //TODO DATABASE DISPLAYING (??)
-        //TODO ITEM ADDING
-        //TODO RECIPE ADDING
-        //TODO MANAGEMENT
 
     }
 }
